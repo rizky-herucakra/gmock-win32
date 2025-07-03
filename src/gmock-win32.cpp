@@ -10,6 +10,7 @@
 #pragma comment(lib, "dbghelp.lib")
 #else
 #include <dbghelp.h>
+#pragma GCC diagnostic ignored "-Wcast-function-type"
 #endif
 
 #include <memory>
