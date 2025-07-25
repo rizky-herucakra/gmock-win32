@@ -15,7 +15,7 @@ To simplify this process, this library allows you to replace imported module fun
 
 Mocking of system functions in general can be a sign of poorly designed code. This means that the code is tightly coupled to the system and relies on a specific implementation with side effects, making it less flexible and difficult to test.
 
-But sometimes it may be impossible (or quite expensive) to rewrite existing code to decouple it from that system API before testing it. Also we must not forget that `wrappers over the system API must also be tested` (and it's usually not recommended to introduce an extra layer of abstraction solely for testing purposes). In such situations, we can use this GMock-lib extension to test that code (at least tests for system wrappers that many projects have).
+But sometimes it may be impossible (or quite expensive) to rewrite existing code to decouple it from that system API before testing it. Also, we must not forget that `wrappers over the system API must also be tested` (and it's usually not recommended to introduce an extra layer of abstraction solely for testing purposes). In such situations, we can use this GMock-lib extension to test that code (at least tests for system wrappers that many projects have).
 In any case, try to avoid [breaking the contracts](https://stackoverflow.com/questions/2965483/unit-tests-the-benefit-from-unit-tests-with-contract-changes) by monitoring/checking test design.
 
 # Implementation idea
@@ -164,7 +164,7 @@ EXPECT_MODULE_FUNC_CALL(GetProcessIdOfThread, _).Times(1);
 There are several Win32 API functions used within GTest code that may interact with client tests. This interaction can lead to oversaturated results or even deadlocks. API used in GTest:
 
 ```cpp
-// Possible list of used APIs in GTest (depends on version of the GTest)
+// Possible list of used APIs in GTest (depends on the version of GTest)
 CloseHandle
 CreateThread
 DeleteCriticalSection
@@ -273,6 +273,7 @@ int main(int argc, char* argv[])
 * `googletest 1.14.0`
 * `googletest 1.15.x`
 * `googletest 1.16.0`
+* `googletest 1.17.0`
 
 # Related Open Source Projects
 
@@ -283,7 +284,7 @@ int main(int argc, char* argv[])
 ## Version 1.2.3 (10 March 2025)
 - Added compatibility with `GCC (MSYS2)`
 - Fixed several compilation warnings
-- Fixed over-saturated tests due to background GTest thread
+- Fixed over-saturated tests due to the background GTest thread
 
 ## Version 1.2.2 (25 January 2024)
 - Added support for `Win32 API forwarding`
@@ -321,10 +322,10 @@ int main(int argc, char* argv[])
 - Added `RESTORE_MODULE_FUNC` macro
 
 ## Version 1.0.2 (12 March 2023)
-- Added support of new `MOCK_*` macro, which no longer requires you to specify the argument count in the name
+- Added support for the new `MOCK_*` macro, which no longer requires you to specify the argument count in the name
 
 ## Version 1.0.1 (10 March 2023)
-- Added support of delegating calls to a real function via `INVOKE_REAL_MODULE_FUNC` macro
+- Added support for delegating calls to a real function via `INVOKE_REAL_MODULE_FUNC` macro
 
 ## Version 1.0.0 (08 March 2023)
 - Initial public release
