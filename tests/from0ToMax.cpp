@@ -8,6 +8,11 @@
 #	pragma clang diagnostic ignored "-Wvoid-pointer-to-int-cast"
 #endif // __clang__
 
+using ::testing::Invoke;
+using ::testing::Eq;
+using ::testing::_;
+using ::testing::Return;
+
 ///////////////////////////////////////////////////////////////////////////////
 // Fixed issue #46:
 //    Mocks always bypassed in handler 
