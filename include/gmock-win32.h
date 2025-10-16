@@ -1099,7 +1099,7 @@ struct mock_module_##func : \
 #define MOCK_MODULE_FUNC(r, ...) \
     MOCK_MODULE_FUNC_(r, false, MOCK_MODULE_FIRST_(__VA_ARGS__), , MOCK_MODULE_NBARG_MINUS1_(__VA_ARGS__), MOCK_MODULE_REST_(__VA_ARGS__))
 
-#define MOCK_MODULE_FUNC_WITH_LOCKS(r, ...) \
+#define MOCK_MODULE_FUNC_WITH_BYPASS(r, ...) \
     MOCK_MODULE_FUNC_(r, true, MOCK_MODULE_FIRST_(__VA_ARGS__), , MOCK_MODULE_NBARG_MINUS1_(__VA_ARGS__), MOCK_MODULE_REST_(__VA_ARGS__))
 
 // Create mock for a cdecl function by passing return_type, name[, arg_types...]
