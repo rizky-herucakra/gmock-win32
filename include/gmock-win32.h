@@ -4,13 +4,13 @@
 #include <gmock/gmock.h>
 
 #ifdef _MSC_VER
-#define PRAGMA_UNOPTIMIZE_ON __pragma(optimize("", on))
-#define PRAGMA_UNOPTIMIZE_OFF __pragma(optimize("", off))
-#define ATTRIBUTE_UNOPTIMIZE
+    #define PRAGMA_UNOPTIMIZE_ON __pragma(optimize("", on))
+    #define PRAGMA_UNOPTIMIZE_OFF __pragma(optimize("", off))
+    #define ATTRIBUTE_UNOPTIMIZE
 #else
-#define PRAGMA_UNOPTIMIZE_ON
-#define PRAGMA_UNOPTIMIZE_OFF
-#define ATTRIBUTE_UNOPTIMIZE __attribute__((optimize("O0")))
+    #define PRAGMA_UNOPTIMIZE_ON
+    #define PRAGMA_UNOPTIMIZE_OFF
+    #define ATTRIBUTE_UNOPTIMIZE __attribute__((optimize("O0")))
 #endif
 
 #ifndef GMOCK_RESULT_
@@ -117,12 +117,12 @@ namespace detail {
 #define BYPASS_MOCKS(expr) \
     do \
     { \
-        const gmock_win32::bypass_mocks blockMocks{ }; \
+        const gmock_win32::bypass_mocks block_mocks{ }; \
         expr; \
     } \
     while (false);
 
-#define MOCK_MODULE_FUNC0_IMPL_(tn, constness, ct, func, ...) \
+#define MOCK_MODULE_FUNC0_IMPL_(tn, constness, ct, func, use_locks, ...) \
 struct mock_module_##func : \
     gmock_win32::detail::mock_module_base< mock_module_##func > \
 { \
@@ -147,19 +147,26 @@ struct mock_module_##func : \
         } \
         else \
         { \
-            const gmock_win32::bypass_mocks blockMocks{ }; \
-            return instance().func(); \
+            if (use_locks) \
+            { \
+                const gmock_win32::bypass_mocks block_mocks{ }; \
+                return instance().func(); \
+            } \
+            else \
+            { \
+                return instance().func(); \
+            } \
         } \
     } \
 };
 
-#define MOCK_MODULE_FUNC0_(m, ...) MOCK_MODULE_FUNC0_IMPL_(, , , m, __VA_ARGS__)
-#define MOCK_MODULE_FUNC0_CALLCONV_(ct, m, ...) MOCK_MODULE_FUNC0_IMPL_(, , ct, m, __VA_ARGS__)
+#define MOCK_MODULE_FUNC0_(m, use_locks, ...) MOCK_MODULE_FUNC0_IMPL_(, , , m, use_locks, __VA_ARGS__)
+#define MOCK_MODULE_FUNC0_CALLCONV_(ct, m, use_locks, ...) MOCK_MODULE_FUNC0_IMPL_(, , ct, m, use_locks, __VA_ARGS__)
 
-#define MOCK_MODULE_FUNC0_STDCALL_CONV_(m, ...) MOCK_MODULE_FUNC0_CALLCONV_(__stdcall, m, __VA_ARGS__)
-#define MOCK_MODULE_FUNC0_CDECL_CONV_(m, ...) MOCK_MODULE_FUNC0_CALLCONV_(__cdecl, m, __VA_ARGS__)
+#define MOCK_MODULE_FUNC0_STDCALL_CONV_(use_locks, m, ...) MOCK_MODULE_FUNC0_CALLCONV_(__stdcall, m, use_locks, __VA_ARGS__)
+#define MOCK_MODULE_FUNC0_CDECL_CONV_(use_locks, m, ...) MOCK_MODULE_FUNC0_CALLCONV_(__cdecl, m, use_locks, __VA_ARGS__)
 
-#define MOCK_MODULE_FUNC1_IMPL_(tn, constness, ct, func, ...) \
+#define MOCK_MODULE_FUNC1_IMPL_(tn, constness, ct, func, use_locks, ...) \
 struct mock_module_##func : \
     gmock_win32::detail::mock_module_base< mock_module_##func > \
 { \
@@ -189,20 +196,28 @@ struct mock_module_##func : \
         } \
         else \
         { \
-            const gmock_win32::bypass_mocks blockMocks{ }; \
-            return instance().func( \
-                gmock_a1); \
+            if (use_locks) \
+            { \
+                const gmock_win32::bypass_mocks block_mocks{ }; \
+                return instance().func( \
+                    gmock_a1); \
+            } \
+            else \
+            { \
+                return instance().func( \
+                    gmock_a1); \
+            } \
         } \
     } \
 };
 
-#define MOCK_MODULE_FUNC1_(m, ...) MOCK_MODULE_FUNC1_IMPL_(, , , m, __VA_ARGS__)
-#define MOCK_MODULE_FUNC1_CALLCONV_(ct, m, ...) MOCK_MODULE_FUNC1_IMPL_(, , ct, m, __VA_ARGS__)
+#define MOCK_MODULE_FUNC1_(m, use_locks, ...) MOCK_MODULE_FUNC1_IMPL_(, , , m, use_locks, __VA_ARGS__)
+#define MOCK_MODULE_FUNC1_CALLCONV_(ct, m, use_locks, ...) MOCK_MODULE_FUNC1_IMPL_(, , ct, m, use_locks, __VA_ARGS__)
 
-#define MOCK_MODULE_FUNC1_STDCALL_CONV_(m, ...) MOCK_MODULE_FUNC1_CALLCONV_(__stdcall, m, __VA_ARGS__)
-#define MOCK_MODULE_FUNC1_CDECL_CONV_(m, ...) MOCK_MODULE_FUNC1_CALLCONV_(__cdecl, m, __VA_ARGS__)
+#define MOCK_MODULE_FUNC1_STDCALL_CONV_(use_locks, m, ...) MOCK_MODULE_FUNC1_CALLCONV_(__stdcall, m, use_locks, __VA_ARGS__)
+#define MOCK_MODULE_FUNC1_CDECL_CONV_(use_locks, m, ...) MOCK_MODULE_FUNC1_CALLCONV_(__cdecl, m, use_locks, __VA_ARGS__)
 
-#define MOCK_MODULE_FUNC2_IMPL_(tn, constness, ct, func, ...) \
+#define MOCK_MODULE_FUNC2_IMPL_(tn, constness, ct, func, use_locks, ...) \
 struct mock_module_##func : \
     gmock_win32::detail::mock_module_base< mock_module_##func > \
 { \
@@ -235,20 +250,28 @@ struct mock_module_##func : \
         } \
         else \
         { \
-            const gmock_win32::bypass_mocks blockMocks{ }; \
-            return instance().func( \
-                gmock_a1, gmock_a2); \
+            if (use_locks) \
+            { \
+                const gmock_win32::bypass_mocks block_mocks{ }; \
+                return instance().func( \
+                    gmock_a1, gmock_a2); \
+            } \
+            else \
+            { \
+                return instance().func( \
+                    gmock_a1, gmock_a2); \
+            } \
         } \
     } \
 };
 
-#define MOCK_MODULE_FUNC2_(m, ...) MOCK_MODULE_FUNC2_IMPL_(, , , m, __VA_ARGS__)
-#define MOCK_MODULE_FUNC2_CALLCONV_(ct, m, ...) MOCK_MODULE_FUNC2_IMPL_(, , ct, m, __VA_ARGS__)
+#define MOCK_MODULE_FUNC2_(m, use_locks, ...) MOCK_MODULE_FUNC2_IMPL_(, , , m, use_locks, __VA_ARGS__)
+#define MOCK_MODULE_FUNC2_CALLCONV_(ct, m, use_locks, ...) MOCK_MODULE_FUNC2_IMPL_(, , ct, m, use_locks, __VA_ARGS__)
 
-#define MOCK_MODULE_FUNC2_STDCALL_CONV_(m, ...) MOCK_MODULE_FUNC2_CALLCONV_(__stdcall, m, __VA_ARGS__)
-#define MOCK_MODULE_FUNC2_CDECL_CONV_(m, ...) MOCK_MODULE_FUNC2_CALLCONV_(__cdecl, m, __VA_ARGS__)
+#define MOCK_MODULE_FUNC2_STDCALL_CONV_(use_locks, m, ...) MOCK_MODULE_FUNC2_CALLCONV_(__stdcall, m, use_locks, __VA_ARGS__)
+#define MOCK_MODULE_FUNC2_CDECL_CONV_(use_locks, m, ...) MOCK_MODULE_FUNC2_CALLCONV_(__cdecl, m, use_locks, __VA_ARGS__)
 
-#define MOCK_MODULE_FUNC3_IMPL_(tn, constness, ct, func, ...) \
+#define MOCK_MODULE_FUNC3_IMPL_(tn, constness, ct, func, use_locks, ...) \
 struct mock_module_##func : \
     gmock_win32::detail::mock_module_base< mock_module_##func > \
 { \
@@ -284,20 +307,28 @@ struct mock_module_##func : \
         } \
         else \
         { \
-            const gmock_win32::bypass_mocks blockMocks{ }; \
-            return instance().func( \
-                gmock_a1, gmock_a2, gmock_a3); \
+            if (use_locks) \
+            { \
+                const gmock_win32::bypass_mocks block_mocks{ }; \
+                return instance().func( \
+                    gmock_a1, gmock_a2, gmock_a3); \
+            } \
+            else \
+            { \
+                return instance().func( \
+                    gmock_a1, gmock_a2, gmock_a3); \
+            } \
         } \
     } \
 };
 
-#define MOCK_MODULE_FUNC3_(m, ...) MOCK_MODULE_FUNC3_IMPL_(, , , m, __VA_ARGS__)
-#define MOCK_MODULE_FUNC3_CALLCONV_(ct, m, ...) MOCK_MODULE_FUNC3_IMPL_(, , ct, m, __VA_ARGS__)
+#define MOCK_MODULE_FUNC3_(m, use_locks, ...) MOCK_MODULE_FUNC3_IMPL_(, , , m, use_locks, __VA_ARGS__)
+#define MOCK_MODULE_FUNC3_CALLCONV_(ct, m, use_locks, ...) MOCK_MODULE_FUNC3_IMPL_(, , ct, m, use_locks, __VA_ARGS__)
 
-#define MOCK_MODULE_FUNC3_STDCALL_CONV_(m, ...) MOCK_MODULE_FUNC3_CALLCONV_(__stdcall, m, __VA_ARGS__)
-#define MOCK_MODULE_FUNC3_CDECL_CONV_(m, ...) MOCK_MODULE_FUNC3_CALLCONV_(__cdecl, m, __VA_ARGS__)
+#define MOCK_MODULE_FUNC3_STDCALL_CONV_(use_locks, m, ...) MOCK_MODULE_FUNC3_CALLCONV_(__stdcall, m, use_locks, __VA_ARGS__)
+#define MOCK_MODULE_FUNC3_CDECL_CONV_(use_locks, m, ...) MOCK_MODULE_FUNC3_CALLCONV_(__cdecl, m, use_locks, __VA_ARGS__)
 
-#define MOCK_MODULE_FUNC4_IMPL_(tn, constness, ct, func, ...) \
+#define MOCK_MODULE_FUNC4_IMPL_(tn, constness, ct, func, use_locks, ...) \
 struct mock_module_##func : \
     gmock_win32::detail::mock_module_base< mock_module_##func > \
 { \
@@ -336,20 +367,28 @@ struct mock_module_##func : \
         } \
         else \
         { \
-            const gmock_win32::bypass_mocks blockMocks{ }; \
-            return instance().func( \
-                gmock_a1, gmock_a2, gmock_a3, gmock_a4); \
+            if (use_locks) \
+            { \
+                const gmock_win32::bypass_mocks block_mocks{ }; \
+                return instance().func( \
+                    gmock_a1, gmock_a2, gmock_a3, gmock_a4); \
+            } \
+            else \
+            { \
+                return instance().func( \
+                    gmock_a1, gmock_a2, gmock_a3, gmock_a4); \
+            } \
         } \
     } \
 };
 
-#define MOCK_MODULE_FUNC4_(m, ...) MOCK_MODULE_FUNC4_IMPL_(, , , m, __VA_ARGS__)
-#define MOCK_MODULE_FUNC4_CALLCONV_(ct, m, ...) MOCK_MODULE_FUNC4_IMPL_(, , ct, m, __VA_ARGS__)
+#define MOCK_MODULE_FUNC4_(m, use_locks, ...) MOCK_MODULE_FUNC4_IMPL_(, , , m, use_locks, __VA_ARGS__)
+#define MOCK_MODULE_FUNC4_CALLCONV_(ct, m, use_locks, ...) MOCK_MODULE_FUNC4_IMPL_(, , ct, m, use_locks, __VA_ARGS__)
 
-#define MOCK_MODULE_FUNC4_STDCALL_CONV_(m, ...) MOCK_MODULE_FUNC4_CALLCONV_(__stdcall, m, __VA_ARGS__)
-#define MOCK_MODULE_FUNC4_CDECL_CONV_(m, ...) MOCK_MODULE_FUNC4_CALLCONV_(__cdecl, m, __VA_ARGS__)
+#define MOCK_MODULE_FUNC4_STDCALL_CONV_(use_locks, m, ...) MOCK_MODULE_FUNC4_CALLCONV_(__stdcall, m, use_locks, __VA_ARGS__)
+#define MOCK_MODULE_FUNC4_CDECL_CONV_(use_locks, m, ...) MOCK_MODULE_FUNC4_CALLCONV_(__cdecl, m, use_locks, __VA_ARGS__)
 
-#define MOCK_MODULE_FUNC5_IMPL_(tn, constness, ct, func, ...) \
+#define MOCK_MODULE_FUNC5_IMPL_(tn, constness, ct, func, use_locks, ...) \
 struct mock_module_##func : \
     gmock_win32::detail::mock_module_base< mock_module_##func > \
 { \
@@ -391,20 +430,28 @@ struct mock_module_##func : \
         } \
         else \
         { \
-            const gmock_win32::bypass_mocks blockMocks{ }; \
-            return instance().func( \
-                gmock_a1, gmock_a2, gmock_a3, gmock_a4, gmock_a5); \
+            if (use_locks) \
+            { \
+                const gmock_win32::bypass_mocks block_mocks{ }; \
+                return instance().func( \
+                    gmock_a1, gmock_a2, gmock_a3, gmock_a4, gmock_a5); \
+            } \
+            else \
+            { \
+                return instance().func( \
+                    gmock_a1, gmock_a2, gmock_a3, gmock_a4, gmock_a5); \
+            } \
         } \
     } \
 };
 
-#define MOCK_MODULE_FUNC5_(m, ...) MOCK_MODULE_FUNC5_IMPL_(, , , m, __VA_ARGS__)
-#define MOCK_MODULE_FUNC5_CALLCONV_(ct, m, ...) MOCK_MODULE_FUNC5_IMPL_(, , ct, m, __VA_ARGS__)
+#define MOCK_MODULE_FUNC5_(m, use_locks, ...) MOCK_MODULE_FUNC5_IMPL_(, , , m, use_locks, __VA_ARGS__)
+#define MOCK_MODULE_FUNC5_CALLCONV_(ct, m, use_locks, ...) MOCK_MODULE_FUNC5_IMPL_(, , ct, m, use_locks, __VA_ARGS__)
 
-#define MOCK_MODULE_FUNC5_STDCALL_CONV_(m, ...) MOCK_MODULE_FUNC5_CALLCONV_(__stdcall, m, __VA_ARGS__)
-#define MOCK_MODULE_FUNC5_CDECL_CONV_(m, ...) MOCK_MODULE_FUNC5_CALLCONV_(__cdecl, m, __VA_ARGS__)
+#define MOCK_MODULE_FUNC5_STDCALL_CONV_(use_locks, m, ...) MOCK_MODULE_FUNC5_CALLCONV_(__stdcall, m, use_locks, __VA_ARGS__)
+#define MOCK_MODULE_FUNC5_CDECL_CONV_(use_locks, m, ...) MOCK_MODULE_FUNC5_CALLCONV_(__cdecl, m, use_locks, __VA_ARGS__)
 
-#define MOCK_MODULE_FUNC6_IMPL_(tn, constness, ct, func, ...) \
+#define MOCK_MODULE_FUNC6_IMPL_(tn, constness, ct, func, use_locks, ...) \
 struct mock_module_##func : \
     gmock_win32::detail::mock_module_base< mock_module_##func > \
 { \
@@ -449,20 +496,28 @@ struct mock_module_##func : \
         } \
         else \
         { \
-            const gmock_win32::bypass_mocks blockMocks{ }; \
-            return instance().func( \
-                gmock_a1, gmock_a2, gmock_a3, gmock_a4, gmock_a5, gmock_a6); \
+            if (use_locks) \
+            { \
+                const gmock_win32::bypass_mocks block_mocks{ }; \
+                return instance().func( \
+                    gmock_a1, gmock_a2, gmock_a3, gmock_a4, gmock_a5, gmock_a6); \
+            } \
+            else \
+            { \
+                return instance().func( \
+                    gmock_a1, gmock_a2, gmock_a3, gmock_a4, gmock_a5, gmock_a6); \
+            } \
         } \
     } \
 };
 
-#define MOCK_MODULE_FUNC6_(m, ...) MOCK_MODULE_FUNC6_IMPL_(, , , m, __VA_ARGS__)
-#define MOCK_MODULE_FUNC6_CALLCONV_(ct, m, ...) MOCK_MODULE_FUNC6_IMPL_(, , ct, m, __VA_ARGS__)
+#define MOCK_MODULE_FUNC6_(m, use_locks, ...) MOCK_MODULE_FUNC6_IMPL_(, , , m, use_locks, __VA_ARGS__)
+#define MOCK_MODULE_FUNC6_CALLCONV_(ct, m, use_locks, ...) MOCK_MODULE_FUNC6_IMPL_(, , ct, m, use_locks, __VA_ARGS__)
 
-#define MOCK_MODULE_FUNC6_STDCALL_CONV_(m, ...) MOCK_MODULE_FUNC6_CALLCONV_(__stdcall, m, __VA_ARGS__)
-#define MOCK_MODULE_FUNC6_CDECL_CONV_(m, ...) MOCK_MODULE_FUNC6_CALLCONV_(__cdecl, m, __VA_ARGS__)
+#define MOCK_MODULE_FUNC6_STDCALL_CONV_(use_locks, m, ...) MOCK_MODULE_FUNC6_CALLCONV_(__stdcall, m, use_locks, __VA_ARGS__)
+#define MOCK_MODULE_FUNC6_CDECL_CONV_(use_locks, m, ...) MOCK_MODULE_FUNC6_CALLCONV_(__cdecl, m, use_locks, __VA_ARGS__)
 
-#define MOCK_MODULE_FUNC7_IMPL_(tn, constness, ct, func, ...) \
+#define MOCK_MODULE_FUNC7_IMPL_(tn, constness, ct, func, use_locks, ...) \
 struct mock_module_##func : \
     gmock_win32::detail::mock_module_base< mock_module_##func > \
 { \
@@ -510,20 +565,28 @@ struct mock_module_##func : \
         } \
         else \
         { \
-            const gmock_win32::bypass_mocks blockMocks{ }; \
-            return instance().func( \
-                gmock_a1, gmock_a2, gmock_a3, gmock_a4, gmock_a5, gmock_a6, gmock_a7); \
+            if (use_locks) \
+            { \
+                const gmock_win32::bypass_mocks block_mocks{ }; \
+                return instance().func( \
+                    gmock_a1, gmock_a2, gmock_a3, gmock_a4, gmock_a5, gmock_a6, gmock_a7); \
+            } \
+            else \
+            { \
+                return instance().func( \
+                    gmock_a1, gmock_a2, gmock_a3, gmock_a4, gmock_a5, gmock_a6, gmock_a7); \
+            } \
         } \
     } \
 };
 
-#define MOCK_MODULE_FUNC7_(m, ...) MOCK_MODULE_FUNC7_IMPL_(, , , m, __VA_ARGS__)
-#define MOCK_MODULE_FUNC7_CALLCONV_(ct, m, ...) MOCK_MODULE_FUNC7_IMPL_(, , ct, m, __VA_ARGS__)
+#define MOCK_MODULE_FUNC7_(m, use_locks, ...) MOCK_MODULE_FUNC7_IMPL_(, , , m, use_locks, __VA_ARGS__)
+#define MOCK_MODULE_FUNC7_CALLCONV_(ct, m, use_locks, ...) MOCK_MODULE_FUNC7_IMPL_(, , ct, m, use_locks, __VA_ARGS__)
 
-#define MOCK_MODULE_FUNC7_STDCALL_CONV_(m, ...) MOCK_MODULE_FUNC7_CALLCONV_(__stdcall, m, __VA_ARGS__)
-#define MOCK_MODULE_FUNC7_CDECL_CONV_(m, ...) MOCK_MODULE_FUNC7_CALLCONV_(__cdecl, m, __VA_ARGS__)
+#define MOCK_MODULE_FUNC7_STDCALL_CONV_(use_locks, m, ...) MOCK_MODULE_FUNC7_CALLCONV_(__stdcall, m, use_locks, __VA_ARGS__)
+#define MOCK_MODULE_FUNC7_CDECL_CONV_(use_locks, m, ...) MOCK_MODULE_FUNC7_CALLCONV_(__cdecl, m, use_locks, __VA_ARGS__)
 
-#define MOCK_MODULE_FUNC8_IMPL_(tn, constness, ct, func, ...) \
+#define MOCK_MODULE_FUNC8_IMPL_(tn, constness, ct, func, use_locks, ...) \
 struct mock_module_##func : \
     gmock_win32::detail::mock_module_base< mock_module_##func > \
 { \
@@ -574,20 +637,28 @@ struct mock_module_##func : \
         } \
         else \
         { \
-            const gmock_win32::bypass_mocks blockMocks{ }; \
-            return instance().func( \
-                gmock_a1, gmock_a2, gmock_a3, gmock_a4, gmock_a5, gmock_a6, gmock_a7, gmock_a8); \
+            if (use_locks) \
+            { \
+                const gmock_win32::bypass_mocks block_mocks{ }; \
+                return instance().func( \
+                    gmock_a1, gmock_a2, gmock_a3, gmock_a4, gmock_a5, gmock_a6, gmock_a7, gmock_a8); \
+            } \
+            else \
+            { \
+                return instance().func( \
+                    gmock_a1, gmock_a2, gmock_a3, gmock_a4, gmock_a5, gmock_a6, gmock_a7, gmock_a8); \
+            } \
         } \
     } \
 };
 
-#define MOCK_MODULE_FUNC8_(m, ...) MOCK_MODULE_FUNC8_IMPL_(, , , m, __VA_ARGS__)
-#define MOCK_MODULE_FUNC8_CALLCONV_(ct, m, ...) MOCK_MODULE_FUNC8_IMPL_(, , ct, m, __VA_ARGS__)
+#define MOCK_MODULE_FUNC8_(m, use_locks, ...) MOCK_MODULE_FUNC8_IMPL_(, , , m, use_locks, __VA_ARGS__)
+#define MOCK_MODULE_FUNC8_CALLCONV_(ct, m, use_locks, ...) MOCK_MODULE_FUNC8_IMPL_(, , ct, m, use_locks, __VA_ARGS__)
 
-#define MOCK_MODULE_FUNC8_STDCALL_CONV_(m, ...) MOCK_MODULE_FUNC8_CALLCONV_(__stdcall, m, __VA_ARGS__)
-#define MOCK_MODULE_FUNC8_CDECL_CONV_(m, ...) MOCK_MODULE_FUNC8_CALLCONV_(__cdecl, m, __VA_ARGS__)
+#define MOCK_MODULE_FUNC8_STDCALL_CONV_(use_locks, m, ...) MOCK_MODULE_FUNC8_CALLCONV_(__stdcall, m, use_locks, __VA_ARGS__)
+#define MOCK_MODULE_FUNC8_CDECL_CONV_(use_locks, m, ...) MOCK_MODULE_FUNC8_CALLCONV_(__cdecl, m, use_locks, __VA_ARGS__)
 
-#define MOCK_MODULE_FUNC9_IMPL_(tn, constness, ct, func, ...) \
+#define MOCK_MODULE_FUNC9_IMPL_(tn, constness, ct, func, use_locks, ...) \
 struct mock_module_##func : \
     gmock_win32::detail::mock_module_base< mock_module_##func > \
 { \
@@ -641,20 +712,28 @@ struct mock_module_##func : \
         } \
         else \
         { \
-            const gmock_win32::bypass_mocks blockMocks{ }; \
-            return instance().func( \
-                gmock_a1, gmock_a2, gmock_a3, gmock_a4, gmock_a5, gmock_a6, gmock_a7, gmock_a8, gmock_a9); \
+            if (use_locks) \
+            { \
+                const gmock_win32::bypass_mocks block_mocks{ }; \
+                return instance().func( \
+                    gmock_a1, gmock_a2, gmock_a3, gmock_a4, gmock_a5, gmock_a6, gmock_a7, gmock_a8, gmock_a9); \
+            } \
+            else \
+            { \
+                return instance().func( \
+                    gmock_a1, gmock_a2, gmock_a3, gmock_a4, gmock_a5, gmock_a6, gmock_a7, gmock_a8, gmock_a9); \
+            } \
         } \
     } \
 };
 
-#define MOCK_MODULE_FUNC9_(m, ...) MOCK_MODULE_FUNC9_IMPL_(, , , m, __VA_ARGS__)
-#define MOCK_MODULE_FUNC9_CALLCONV_(ct, m, ...) MOCK_MODULE_FUNC9_IMPL_(, , ct, m, __VA_ARGS__)
+#define MOCK_MODULE_FUNC9_(m, use_locks, ...) MOCK_MODULE_FUNC9_IMPL_(, , , m, use_locks, __VA_ARGS__)
+#define MOCK_MODULE_FUNC9_CALLCONV_(ct, m, use_locks, ...) MOCK_MODULE_FUNC9_IMPL_(, , ct, m, use_locks, __VA_ARGS__)
 
-#define MOCK_MODULE_FUNC9_STDCALL_CONV_(m, ...) MOCK_MODULE_FUNC9_CALLCONV_(__stdcall, m, __VA_ARGS__)
-#define MOCK_MODULE_FUNC9_CDECL_CONV_(m, ...) MOCK_MODULE_FUNC9_CALLCONV_(__cdecl, m, __VA_ARGS__)
+#define MOCK_MODULE_FUNC9_STDCALL_CONV_(use_locks, m, ...) MOCK_MODULE_FUNC9_CALLCONV_(__stdcall, m, use_locks, __VA_ARGS__)
+#define MOCK_MODULE_FUNC9_CDECL_CONV_(use_locks, m, ...) MOCK_MODULE_FUNC9_CALLCONV_(__cdecl, m, use_locks, __VA_ARGS__)
 
-#define MOCK_MODULE_FUNC10_IMPL_(tn, constness, ct, func, ...) \
+#define MOCK_MODULE_FUNC10_IMPL_(tn, constness, ct, func, use_locks, ...) \
 struct mock_module_##func : \
     gmock_win32::detail::mock_module_base< mock_module_##func > \
 { \
@@ -711,20 +790,28 @@ struct mock_module_##func : \
         } \
         else \
         { \
-            const gmock_win32::bypass_mocks blockMocks{ }; \
-            return instance().func( \
-                gmock_a1, gmock_a2, gmock_a3, gmock_a4, gmock_a5, gmock_a6, gmock_a7, gmock_a8, gmock_a9, gmock_a10); \
+            if (use_locks) \
+            { \
+                const gmock_win32::bypass_mocks block_mocks{ }; \
+                return instance().func( \
+                    gmock_a1, gmock_a2, gmock_a3, gmock_a4, gmock_a5, gmock_a6, gmock_a7, gmock_a8, gmock_a9, gmock_a10); \
+            } \
+            else \
+            { \
+                return instance().func( \
+                    gmock_a1, gmock_a2, gmock_a3, gmock_a4, gmock_a5, gmock_a6, gmock_a7, gmock_a8, gmock_a9, gmock_a10); \
+            } \
         } \
     } \
 };
 
-#define MOCK_MODULE_FUNC10_(m, ...) MOCK_MODULE_FUNC10_IMPL_(, , , m, __VA_ARGS__)
-#define MOCK_MODULE_FUNC10_CALLCONV_(ct, m, ...) MOCK_MODULE_FUNC10_IMPL_(, , ct, m, __VA_ARGS__)
+#define MOCK_MODULE_FUNC10_(m, use_locks, ...) MOCK_MODULE_FUNC10_IMPL_(, , , m, use_locks, __VA_ARGS__)
+#define MOCK_MODULE_FUNC10_CALLCONV_(ct, m, use_locks, ...) MOCK_MODULE_FUNC10_IMPL_(, , ct, m, use_locks, __VA_ARGS__)
 
-#define MOCK_MODULE_FUNC10_STDCALL_CONV_(m, ...) MOCK_MODULE_FUNC10_CALLCONV_(__stdcall, m, __VA_ARGS__)
-#define MOCK_MODULE_FUNC10_CDECL_CONV_(m, ...) MOCK_MODULE_FUNC10_CALLCONV_(__cdecl, m, __VA_ARGS__)
+#define MOCK_MODULE_FUNC10_STDCALL_CONV_(use_locks, m, ...) MOCK_MODULE_FUNC10_CALLCONV_(__stdcall, m, use_locks, __VA_ARGS__)
+#define MOCK_MODULE_FUNC10_CDECL_CONV_(use_locks, m, ...) MOCK_MODULE_FUNC10_CALLCONV_(__cdecl, m, use_locks, __VA_ARGS__)
 
-#define MOCK_MODULE_FUNC11_IMPL_(tn, constness, ct, func, ...) \
+#define MOCK_MODULE_FUNC11_IMPL_(tn, constness, ct, func, use_locks, ...) \
 struct mock_module_##func : \
     gmock_win32::detail::mock_module_base< mock_module_##func > \
 { \
@@ -784,20 +871,28 @@ struct mock_module_##func : \
         } \
         else \
         { \
-            const gmock_win32::bypass_mocks blockMocks{ }; \
-            return instance().func( \
-                gmock_a1, gmock_a2, gmock_a3, gmock_a4, gmock_a5, gmock_a6, gmock_a7, gmock_a8, gmock_a9, gmock_a10, gmock_a11); \
+            if (use_locks) \
+            { \
+                const gmock_win32::bypass_mocks block_mocks{ }; \
+                return instance().func( \
+                    gmock_a1, gmock_a2, gmock_a3, gmock_a4, gmock_a5, gmock_a6, gmock_a7, gmock_a8, gmock_a9, gmock_a10, gmock_a11); \
+            } \
+            else \
+            { \
+                return instance().func( \
+                    gmock_a1, gmock_a2, gmock_a3, gmock_a4, gmock_a5, gmock_a6, gmock_a7, gmock_a8, gmock_a9, gmock_a10, gmock_a11); \
+            } \
         } \
     } \
 };
 
-#define MOCK_MODULE_FUNC11_(m, ...) MOCK_MODULE_FUNC11_IMPL_(, , , m, __VA_ARGS__)
-#define MOCK_MODULE_FUNC11_CALLCONV_(ct, m, ...) MOCK_MODULE_FUNC11_IMPL_(, , ct, m, __VA_ARGS__)
+#define MOCK_MODULE_FUNC11_(m, use_locks, ...) MOCK_MODULE_FUNC11_IMPL_(, , , m, use_locks, __VA_ARGS__)
+#define MOCK_MODULE_FUNC11_CALLCONV_(ct, m, use_locks, ...) MOCK_MODULE_FUNC11_IMPL_(, , ct, m, use_locks, __VA_ARGS__)
 
-#define MOCK_MODULE_FUNC11_STDCALL_CONV_(m, ...) MOCK_MODULE_FUNC11_CALLCONV_(__stdcall, m, __VA_ARGS__)
-#define MOCK_MODULE_FUNC11_CDECL_CONV_(m, ...) MOCK_MODULE_FUNC11_CALLCONV_(__cdecl, m, __VA_ARGS__)
+#define MOCK_MODULE_FUNC11_STDCALL_CONV_(use_locks, m, ...) MOCK_MODULE_FUNC11_CALLCONV_(__stdcall, m, use_locks, __VA_ARGS__)
+#define MOCK_MODULE_FUNC11_CDECL_CONV_(use_locks, m, ...) MOCK_MODULE_FUNC11_CALLCONV_(__cdecl, m, use_locks, __VA_ARGS__)
 
-#define MOCK_MODULE_FUNC12_IMPL_(tn, constness, ct, func, ...) \
+#define MOCK_MODULE_FUNC12_IMPL_(tn, constness, ct, func, use_locks, ...) \
 struct mock_module_##func : \
     gmock_win32::detail::mock_module_base< mock_module_##func > \
 { \
@@ -860,20 +955,28 @@ struct mock_module_##func : \
         } \
         else \
         { \
-            const gmock_win32::bypass_mocks blockMocks{ }; \
-            return instance().func( \
-                gmock_a1, gmock_a2, gmock_a3, gmock_a4, gmock_a5, gmock_a6, gmock_a7, gmock_a8, gmock_a9, gmock_a10, gmock_a11, gmock_a12); \
+            if (use_locks) \
+            { \
+                const gmock_win32::bypass_mocks block_mocks{ }; \
+                return instance().func( \
+                    gmock_a1, gmock_a2, gmock_a3, gmock_a4, gmock_a5, gmock_a6, gmock_a7, gmock_a8, gmock_a9, gmock_a10, gmock_a11, gmock_a12); \
+            } \
+            else \
+            { \
+                return instance().func( \
+                    gmock_a1, gmock_a2, gmock_a3, gmock_a4, gmock_a5, gmock_a6, gmock_a7, gmock_a8, gmock_a9, gmock_a10, gmock_a11, gmock_a12); \
+            } \
         } \
     } \
 };
 
-#define MOCK_MODULE_FUNC12_(m, ...) MOCK_MODULE_FUNC12_IMPL_(, , , m, __VA_ARGS__)
-#define MOCK_MODULE_FUNC12_CALLCONV_(ct, m, ...) MOCK_MODULE_FUNC12_IMPL_(, , ct, m, __VA_ARGS__)
+#define MOCK_MODULE_FUNC12_(m, use_locks, ...) MOCK_MODULE_FUNC12_IMPL_(, , , m, use_locks, __VA_ARGS__)
+#define MOCK_MODULE_FUNC12_CALLCONV_(ct, m, use_locks, ...) MOCK_MODULE_FUNC12_IMPL_(, , ct, m, use_locks, __VA_ARGS__)
 
-#define MOCK_MODULE_FUNC12_STDCALL_CONV_(m, ...) MOCK_MODULE_FUNC12_CALLCONV_(__stdcall, m, __VA_ARGS__)
-#define MOCK_MODULE_FUNC12_CDECL_CONV_(m, ...) MOCK_MODULE_FUNC12_CALLCONV_(__cdecl, m, __VA_ARGS__)
+#define MOCK_MODULE_FUNC12_STDCALL_CONV_(use_locks, m, ...) MOCK_MODULE_FUNC12_CALLCONV_(__stdcall, m, use_locks, __VA_ARGS__)
+#define MOCK_MODULE_FUNC12_CDECL_CONV_(use_locks, m, ...) MOCK_MODULE_FUNC12_CALLCONV_(__cdecl, m, use_locks, __VA_ARGS__)
 
-#define MOCK_MODULE_FUNC13_IMPL_(tn, constness, ct, func, ...) \
+#define MOCK_MODULE_FUNC13_IMPL_(tn, constness, ct, func, use_locks, ...) \
 struct mock_module_##func : \
     gmock_win32::detail::mock_module_base< mock_module_##func > \
 { \
@@ -939,18 +1042,26 @@ struct mock_module_##func : \
         } \
         else \
         { \
-            const gmock_win32::bypass_mocks blockMocks{ }; \
-            return instance().func( \
-                gmock_a1, gmock_a2, gmock_a3, gmock_a4, gmock_a5, gmock_a6, gmock_a7, gmock_a8, gmock_a9, gmock_a10, gmock_a11, gmock_a12, gmock_a13); \
+            if (use_locks) \
+            { \
+                const gmock_win32::bypass_mocks block_mocks{ }; \
+                return instance().func( \
+                    gmock_a1, gmock_a2, gmock_a3, gmock_a4, gmock_a5, gmock_a6, gmock_a7, gmock_a8, gmock_a9, gmock_a10, gmock_a11, gmock_a12, gmock_a13); \
+            } \
+            else \
+            { \
+                return instance().func( \
+                    gmock_a1, gmock_a2, gmock_a3, gmock_a4, gmock_a5, gmock_a6, gmock_a7, gmock_a8, gmock_a9, gmock_a10, gmock_a11, gmock_a12, gmock_a13); \
+            } \
         } \
     } \
 };
 
-#define MOCK_MODULE_FUNC13_(m, ...) MOCK_MODULE_FUNC13_IMPL_(, , , m, __VA_ARGS__)
-#define MOCK_MODULE_FUNC13_CALLCONV_(ct, m, ...) MOCK_MODULE_FUNC13_IMPL_(, , ct, m, __VA_ARGS__)
+#define MOCK_MODULE_FUNC13_(m, use_locks, ...) MOCK_MODULE_FUNC13_IMPL_(, , , m, use_locks, __VA_ARGS__)
+#define MOCK_MODULE_FUNC13_CALLCONV_(ct, m, use_locks, ...) MOCK_MODULE_FUNC13_IMPL_(, , ct, m, use_locks, __VA_ARGS__)
 
-#define MOCK_MODULE_FUNC13_STDCALL_CONV_(m, ...) MOCK_MODULE_FUNC13_CALLCONV_(__stdcall, m, __VA_ARGS__)
-#define MOCK_MODULE_FUNC13_CDECL_CONV_(m, ...) MOCK_MODULE_FUNC13_CALLCONV_(__cdecl, m, __VA_ARGS__)
+#define MOCK_MODULE_FUNC13_STDCALL_CONV_(use_locks, m, ...) MOCK_MODULE_FUNC13_CALLCONV_(__stdcall, m, use_locks, __VA_ARGS__)
+#define MOCK_MODULE_FUNC13_CDECL_CONV_(use_locks, m, ...) MOCK_MODULE_FUNC13_CALLCONV_(__cdecl, m, use_locks, __VA_ARGS__)
 
 #define MOCK_MODULE_EXPAND_(x) x
 #define MOCK_MODULE_UNITE_(x, y) x y
@@ -966,7 +1077,7 @@ struct mock_module_##func : \
 
 // Expand before concatenate
 #define MOCK_MODULE_MAKENAME_(count_args, conv) MOCK_MODULE_FUNC##count_args##conv##_
-#define MOCK_MODULE_OVERLOAD_(count_args, conv, signat) MOCK_MODULE_MAKENAME_( count_args, conv )signat
+#define MOCK_MODULE_OVERLOAD_(count_args, conv, signat) MOCK_MODULE_MAKENAME_(count_args, conv) signat
 #define MOCK_MODULE_FUNC_OVERLOAD_(name, ...) MOCK_MODULE_UNITE_(MOCK_MODULE_OVERLOAD_(name, MOCK_MODULE_NBARG_(__VA_ARGS__)), (__VA_ARGS__))
 
 #define MOCK_MODULE_AVOID_OPT_(m) \
@@ -977,22 +1088,35 @@ struct mock_module_##func : \
     } \
     PRAGMA_UNOPTIMIZE_OFF
 
-// helper to paste m and args from __VA_ARGS__ below
-#define MOCK_MODULE_FUNC_(r, m, conv, count_args, ...) \
-    MOCK_MODULE_OVERLOAD_( count_args, conv, (m, r(__VA_ARGS__)) ) \
-    MOCK_MODULE_AVOID_OPT_( m )
+// Helper to paste m and args from __VA_ARGS__ below
 
-/// Create mock for a function by passing return_type, name[, arg_types...]
+#define MOCK_MODULE_FUNC_(r, use_locks, m, conv, count_args, ...) \
+    MOCK_MODULE_OVERLOAD_(count_args, conv, (use_locks, m, r(__VA_ARGS__))) \
+    MOCK_MODULE_AVOID_OPT_(m)
+
+// Create mock for a function by passing return_type, name[, arg_types...]
+
 #define MOCK_MODULE_FUNC(r, ...) \
-    MOCK_MODULE_FUNC_(r, MOCK_MODULE_FIRST_(__VA_ARGS__), , MOCK_MODULE_NBARG_MINUS1_(__VA_ARGS__), MOCK_MODULE_REST_(__VA_ARGS__))
+    MOCK_MODULE_FUNC_(r, false, MOCK_MODULE_FIRST_(__VA_ARGS__), , MOCK_MODULE_NBARG_MINUS1_(__VA_ARGS__), MOCK_MODULE_REST_(__VA_ARGS__))
 
-/// Create mock for a cdecl function by passing return_type, name[, arg_types...]
+#define MOCK_MODULE_FUNC_WITH_LOCKS(r, ...) \
+    MOCK_MODULE_FUNC_(r, true, MOCK_MODULE_FIRST_(__VA_ARGS__), , MOCK_MODULE_NBARG_MINUS1_(__VA_ARGS__), MOCK_MODULE_REST_(__VA_ARGS__))
+
+// Create mock for a cdecl function by passing return_type, name[, arg_types...]
+
 #define MOCK_CDECL_FUNC(r, ...) \
-    MOCK_MODULE_FUNC_(r, MOCK_MODULE_FIRST_(__VA_ARGS__), _CDECL_CONV, MOCK_MODULE_NBARG_MINUS1_(__VA_ARGS__), MOCK_MODULE_REST_(__VA_ARGS__))
+    MOCK_MODULE_FUNC_(r, false, MOCK_MODULE_FIRST_(__VA_ARGS__), _CDECL_CONV, MOCK_MODULE_NBARG_MINUS1_(__VA_ARGS__), MOCK_MODULE_REST_(__VA_ARGS__))
 
-/// Create mock for a stdcall function by passing return_type, name[, arg_types...]
+#define MOCK_CDECL_FUNC_WITH_BYPASS(r, ...) \
+    MOCK_MODULE_FUNC_(r, true, MOCK_MODULE_FIRST_(__VA_ARGS__), _CDECL_CONV, MOCK_MODULE_NBARG_MINUS1_(__VA_ARGS__), MOCK_MODULE_REST_(__VA_ARGS__))
+
+// Create mock for a stdcall function by passing return_type, name[, arg_types...]
+
 #define MOCK_STDCALL_FUNC(r, ...) \
-    MOCK_MODULE_FUNC_(r, MOCK_MODULE_FIRST_(__VA_ARGS__), _STDCALL_CONV, MOCK_MODULE_NBARG_MINUS1_(__VA_ARGS__), MOCK_MODULE_REST_(__VA_ARGS__))
+    MOCK_MODULE_FUNC_(r, false, MOCK_MODULE_FIRST_(__VA_ARGS__), _STDCALL_CONV, MOCK_MODULE_NBARG_MINUS1_(__VA_ARGS__), MOCK_MODULE_REST_(__VA_ARGS__))
+
+#define MOCK_STDCALL_FUNC_WITH_BYPASS(r, ...) \
+    MOCK_MODULE_FUNC_(r, true, MOCK_MODULE_FIRST_(__VA_ARGS__), _STDCALL_CONV, MOCK_MODULE_NBARG_MINUS1_(__VA_ARGS__), MOCK_MODULE_REST_(__VA_ARGS__))
 
 // Expectations
 
@@ -1041,7 +1165,7 @@ struct mock_module_##func : \
 
 #define RESTORE_MODULE_FUNC_IMPL_(func) \
     gmock_win32::detail::restore_module_func( \
-        #func, *mock_module_##func::pp_old_fn(), reinterpret_cast<void*>(mock_module_##func::stub), mock_module_##func::pp_old_fn())
+        #func, *mock_module_##func::pp_old_fn(), reinterpret_cast< void* >(mock_module_##func::stub), mock_module_##func::pp_old_fn())
 
 #define RESTORE_MODULE_FUNC(func) \
     RESTORE_MODULE_FUNC_IMPL_(func)
