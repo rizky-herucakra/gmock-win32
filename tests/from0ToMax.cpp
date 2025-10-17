@@ -8,7 +8,69 @@
 #	pragma clang diagnostic ignored "-Wvoid-pointer-to-int-cast"
 #endif // __clang__
 
-MOCK_STDCALL_FUNC(DWORD, GetCurrentThreadId);
+using ::testing::Invoke;
+using ::testing::Eq;
+using ::testing::_;
+using ::testing::Return;
+
+///////////////////////////////////////////////////////////////////////////////
+// Fixed issue #46:
+//    Mocks always bypassed in handler 
+
+BOOL CALLBACK CountWindowProc(HWND hwnd, LPARAM lParam)
+{
+    if (::IsWindowVisible(hwnd))
+    {
+        auto* pCount = reinterpret_cast< size_t* >(lParam);
+        (*pCount)++;
+    }
+
+    return TRUE;
+}
+
+size_t CountVisibleWindows()
+{
+    size_t count = 0;
+    ::EnumWindows(CountWindowProc, reinterpret_cast< LPARAM >(&count));
+    return count;
+}
+
+MOCK_STDCALL_FUNC(BOOL, EnumWindows, WNDENUMPROC lpEnumFunc, LPARAM lParam);
+MOCK_STDCALL_FUNC(BOOL, IsWindowVisible, HWND hwnd);
+
+BOOL FakeEnumWindows(WNDENUMPROC lpEnumFunc, LPARAM lParam)
+{
+    for (size_t i = 0; i < 10; ++i)
+    {
+        if (!lpEnumFunc(reinterpret_cast< HWND >(i + 10), lParam)) {
+            break;
+        }
+    }
+    return TRUE;
+}
+
+BOOL FakeIsWindowVisible(HWND hwnd)
+{
+    return (reinterpret_cast< size_t >(hwnd) % 2) == 0;
+}
+
+TEST(Win32Mock, TestVisibleWindowCount)
+{
+    ON_MODULE_FUNC_CALL(EnumWindows, _, _).WillByDefault(Invoke(FakeEnumWindows));
+    ON_MODULE_FUNC_CALL(IsWindowVisible, _).WillByDefault(Invoke(FakeIsWindowVisible));
+
+    ASSERT_EQ(CountVisibleWindows(), 5);
+
+    VERIFY_AND_CLEAR_MODULE_FUNC_EXPECTATIONS(EnumWindows);
+    VERIFY_AND_CLEAR_MODULE_FUNC_EXPECTATIONS(IsWindowVisible);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Fixed issue #43:
+//    Over-saturated tests with mocking bypassing for GetCurrentThreadId for GTest
+//    versions: 1.15.0, 1.15.2, 1.16.0
+
+MOCK_STDCALL_FUNC_WITH_BYPASS(DWORD, GetCurrentThreadId);
 
 TEST(GetCurrentThreadIdTest, BypassMocks)
 {

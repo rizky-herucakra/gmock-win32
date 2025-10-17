@@ -3,14 +3,14 @@
 #include <windows.h>
 
 #ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable: 4091)
-#include <dbghelp.h>
-#pragma warning(pop)
-#pragma comment(lib, "dbghelp.lib")
+    #pragma warning(push)
+    #pragma warning(disable: 4091)
+        #include <dbghelp.h>
+    #pragma warning(pop)
+    #pragma comment(lib, "dbghelp.lib")
 #else
-#include <dbghelp.h>
-#pragma GCC diagnostic ignored "-Wcast-function-type"
+    #include <dbghelp.h>
+    #pragma GCC diagnostic ignored "-Wcast-function-type"
 #endif
 
 #include <memory>
@@ -18,8 +18,8 @@
 #include <stdexcept>
 
 #ifndef _MSC_VER
-#define __try try
-#define __except(...) catch(...)
+    #define __try try
+    #define __except(...) catch(...)
 #endif
 
 #define THROW_HRESULT(hr, text)                     \
@@ -62,8 +62,8 @@ namespace module {
 namespace utils {
 
 #ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable: 4702)
+    #pragma warning(push)
+    #pragma warning(disable: 4702)
 #endif
     UniqueHMODULE loadModule(const wchar_t* moduleName)
     {
@@ -75,7 +75,7 @@ namespace utils {
         return UniqueHMODULE{ nullptr, { } };
     }
 #ifdef _MSC_VER
-#pragma warning(pop)
+    #pragma warning(pop)
 #endif
 
     int strcmp(const char* s1, const char* s2) noexcept
@@ -251,8 +251,8 @@ namespace utils {
                 {
                     if (*thunkProc(thunkIAT) == funcAddr)
                     {
-                            *ppfn = thunkProc(thunkIAT);
-                            return S_OK;
+                        *ppfn = thunkProc(thunkIAT);
+                        return S_OK;
                     }
                 }
                 else

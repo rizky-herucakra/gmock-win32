@@ -184,19 +184,16 @@ Sleep
 WaitForSingleObject
 ```
 
-To address such issues, we have two options. First, we can utilize the `BYPASS_MOCKS` macro to suppress mocks during the execution of GMock code. Alternatively, we can create a `gmock_win32::bypass_mocks{ }` object to apply suppression within a specific scope.
+To address such issues, we have two options. First, we can utilize the `BYPASS_MOCKS` / `MOCK_STDCALL_FUNC_WITH_BYPASS / MOCK_CDECL_FUNC_WITH_BYPASS` macrodefines to suppress mocks during the execution of GMock code. Alternatively, we can create a `gmock_win32::bypass_mocks{ }` object to apply suppression within a specific scope.
 
-However, it's important to note that you do not need to manually suppress mocks when creating function mocks using the `MOCK_STDCALL_FUNC` or `MOCK_CDECL_FUNC` macros, or when setting up expectations with their clauses using the `ON_MODULE_FUNC_CALL` or `EXPECT_MODULE_FUNC_CALL` macros - this is done automatically for you. Additionally, there's the option to use `RESTORE_MODULE_FUNC` to revert the API to its original state, for instance, before calling `VERIFY_AND_CLEAR_MODULE_FUNC_EXPECTATIONS`.
+However, it's important to note that you do not need to manually suppress mocks when setting up expectations with their clauses using the `ON_MODULE_FUNC_CALL` or `EXPECT_MODULE_FUNC_CALL` macros - this is done automatically for you. Additionally, there's the option to use `RESTORE_MODULE_FUNC` to revert the API to its original state, for instance, before calling `VERIFY_AND_CLEAR_MODULE_FUNC_EXPECTATIONS`.
 
 ## Mocks bypassing example:
 
 ```cpp
 #include <gmock-win32.h>
 
-// There's no need to take any action to suppress mocks during
-// their creation:
-
-MOCK_STDCALL_FUNC(DWORD, GetCurrentThreadId);
+MOCK_STDCALL_FUNC_WITH_BYPASS(DWORD, GetCurrentThreadId);
 ...
 
 TEST(GetCurrentThreadIdTest, BaseTest)
@@ -281,6 +278,10 @@ int main(int argc, char* argv[])
 
 # Version history
 
+## Version 1.3.0 (16 October 2025)
+- Fixed mocks bypassing in API handlers / callbacks
+- Fixed GCC function pointer cast warnings
+
 ## Version 1.2.3 (10 March 2025)
 - Added compatibility with `GCC (MSYS2)`
 - Fixed several compilation warnings
@@ -306,13 +307,13 @@ int main(int argc, char* argv[])
 - Disabled optimization for sensitive code sections
 - Fixed `LNK1169`: one or more multiply defined symbols found (for an old function pointer)
 
+<details>
+<summary>Old versions</summary>
+
 ## Version 1.1.0 (29 August 2023)
 - Added support for functions with 9-13 parameters
 - Added `REAL_MODULE_FUNC` macro
 - Fixed problem with Windows `ApiSet` DLL functions redirection (`AppCompat` via `Shimm DLL`)
-
-<details>
-<summary>Old versions</summary>
 
 ## Version 1.0.4 (19 March 2023)
 - Added support for googletest v1.11.0 / v1.12.1 / v1.13.0
@@ -330,3 +331,10 @@ int main(int argc, char* argv[])
 ## Version 1.0.0 (08 March 2023)
 - Initial public release
 </details>
+
+### Versioning format and rules
+
+`Format: A.B.C:`
+- Increment C for minor changes and backward-compatible fixes
+- Increment B for functional changes that are not backward compatible
+- Increment A for major revisions introducing significant new functionality or architectural changes
